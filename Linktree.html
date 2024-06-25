@@ -1,270 +1,76 @@
-<!doctype html>
-<html class="no-js" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title></title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script type="text/javascript" src="https://rawgithub.com/dynamicguy/tagcloud/master/src/tagcloud.jquery.js"></script>
-
+    <title>3D Gyroscope Effect</title>
     <style>
-        * {
-            resize: none;
-            border: none;
-            outline: none;
-            text-decoration: none;
-            padding: 0px;
-            margin: 0px;
-            list-style-type: none;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body, html {
             margin: 0;
-            background-color: #f0f0f0;
-        }
-
-        #tagcloud {
-            width: 100%;
-            max-width: 400px;
+            padding: 0;
+            overflow: hidden;
             height: 100%;
-            max-height: 400px;
-            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
         }
-
-        #tagcloud a {
-            color: red; /* Set text color to black */
+        .container {
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
         }
-
-        @media (max-width: 600px) {
-            #tagcloud {
-                max-width: 300px;
-                max-height: 300px;
-            }
+        .cube {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 0.1s;
         }
+        .face {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .face1 { transform: rotateY(0deg) translateZ(100px); }
+        .face2 { transform: rotateY(90deg) translateZ(100px); }
+        .face3 { transform: rotateY(180deg) translateZ(100px); }
+        .face4 { transform: rotateY(-90deg) translateZ(100px); }
+        .face5 { transform: rotateX(90deg) translateZ(100px); }
+        .face6 { transform: rotateX(-90deg) translateZ(100px); }
     </style>
-
-    <script type="text/javascript">
-        var settings = {
-            height: 400,
-            width: 400,
-            radius: 150,
-            speed: 1, // Reduced speed
-            slower: 0.9,
-            timer: 5,
-            fontMultiplier: 20, // Increase font size
-            hoverStyle: {
-                border: 'none',
-                color: '#0b2e6f'
-            },
-            mouseOutStyle: {
-                border: '',
-                color: ''
-            }
-        };
-
-        $(document).ready(function() {
-            $('#tagcloud').tagoSphere(settings);
-        });
-
-        (function($) {
-            var tags;
-            var mathAssets = {
-                halfHeight: null,
-                halfWidth: null,
-                hwratio: null,
-                dtr: null,
-                diameter: null,
-                speedX: null,
-                speedY: null,
-                tLength: null
-            };
-            var settings = {
-                height: 400,
-                width: 400,
-                radius: 150,
-                speed: 0.2, // Reduced speed
-                slower: 0.9,
-                timer: 5,
-                fontMultiplier: 20, // Increase font size
-                hoverStyle: {
-                    border: '1px solid #935C26',
-                    color: '#935C26'
-                },
-                mouseOutStyle: {
-                    border: 'none',
-                    color: 'red'
-                }
-            };
-
-            var curState = {
-                mouseOver: null,
-                lastFy: null,
-                lastFx: null,
-                sy: null,
-                cy: null,
-                sx: null,
-                cx: null,
-                mouseX: null,
-                mouseY: null
-            };
-            var options = {};
-            jQuery.fn.tagoSphere = function(opt) {
-                options = jQuery.extend(settings, opt);
-                initContainer(this);
-                initTags(this);
-                initMaths();
-                deployTags();
-                setInterval(updateTags, options.timer);
-                return this;
-            };
-
-            function initMaths() {
-                mathAssets.halfHeight = options.height / 2;
-                mathAssets.halfWidth = options.width / 2;
-                mathAssets.speedX = options.speed / mathAssets.halfWidth;
-                mathAssets.speedY = options.speed / mathAssets.halfHeight;
-                mathAssets.dtr = Math.PI / 180;
-                mathAssets.diameter = options.radius * 2;
-                mathAssets.hwratio = options.height / options.width;
-                mathAssets.whratio = options.width / options.height;
-                mathAssets.tLength = tags.length - 1;
-                curState.mouseOver = false;
-                curState.lastFx = options.speed;
-                curState.lastFy = options.speed;
-            }
-
-            function initContainer(tagContainer) {
-                tagContainer.height(options.height);
-                tagContainer.width(options.width);
-                tagContainer.css({
-                    'overflow': 'hidden',
-                    'position': 'relative'
-                });
-                tagContainer.mousemove(function(e) {
-                    curState.mouseX = e.pageX - this.offsetLeft;
-                    curState.mouseY = e.pageY - this.offsetTop;
-                });
-                tagContainer.hover(function() {
-                    curState.mouseOver = true;
-                }, function() {
-                    curState.mouseOver = false;
-                });
-            }
-
-            function initTags(tagContainer) {
-                tags = tagContainer.children('ul').children();
-                tags.css({
-                    'position': 'absolute',
-                    'list-style-type': 'none',
-                    'list-style-position': 'outside',
-                    'list-style-image': 'none'
-                });
-                for (var i = 0; i < tags.length; i++) {
-                    var jTag = jQuery(tags[i]);
-                    var link = jQuery(jTag.children()[0]);
-                    tags[i] = jTag;
-                    jTag.hover(function() {
-                        jQuery(this).css(options.hoverStyle);
-                    }, function() {
-                        jQuery(this).css(options.mouseOutStyle);
-                    });
-                }
-            }
-
-            function deployTags() {
-                var step = Math.PI * 2 / mathAssets.tLength;
-                var gridSize = Math.ceil(Math.sqrt(mathAssets.tLength));
-                var cellWidth = options.width / gridSize;
-                var cellHeight = options.height / gridSize;
-
-                for (var i = 0; i <= mathAssets.tLength; i++) {
-                    var angle = step * i;
-                    var row = Math.floor(i / gridSize);
-                    var col = i % gridSize;
-                    tags[i].cx = col * cellWidth - options.width / 2.13 + cellWidth / 2;
-                    tags[i].cy = row * cellHeight - options.height / 2.5 + cellHeight / 2;
-                    tags[i].cz = 0; // Flatten to 2D plane for grid layout
-                    tags[i].h = jQuery(tags[i]).height() / 2;
-                    tags[i].w = jQuery(tags[i]).width() / 2;
-                }
-            }
-
-            function calcRotation(fy, fx) {
-                curState.sy = Math.sin(fy * mathAssets.dtr);
-                curState.cy = Math.cos(fy * mathAssets.dtr);
-                curState.sx = Math.sin(fx * mathAssets.dtr);
-                curState.cx = Math.cos(fx * mathAssets.dtr);
-            }
-
-            function updateTags() {
-                var fy;
-                var fx;
-                if (curState.mouseOver) {
-                    fy = options.speed - mathAssets.speedY * curState.mouseY;
-                    fx = mathAssets.speedX * curState.mouseX - options.speed;
-                } else {
-                    fy = curState.lastFy * options.slower;
-                    fx = curState.lastFx * options.slower;
-                }
-                if (curState.lastFy != fy || curState.lastFx != fx) {
-                    calcRotation(fy, fx);
-                    curState.lastFy = fy;
-                    curState.lastFx = fx;
-                }
-                if (Math.abs(fy) > 0.01 || Math.abs(fx) > 0.01) {
-                    j = -1;
-                    while (j++ < mathAssets.tLength) {
-                        rx1 = tags[j].cx;
-                        ry1 = tags[j].cy * curState.cy + tags[j].cz * -curState.sy;
-                        rz1 = tags[j].cy * curState.sy + tags[j].cz * curState.cy;
-                        tags[j].cx = rx1 * curState.cx + rz1 * curState.sx;
-                        tags[j].cy = tags[j].cy * curState.cy + tags[j].cz * -curState.sy;
-                        tags[j].cz = rx1 * -curState.sx + rz1 * curState.cx;
-                        var per = mathAssets.diameter / (mathAssets.diameter + tags[j].cz);
-                        tags[j].x = tags[j].cx * per;
-                        tags[j].y = tags[j].cy * per;
-                        tags[j].alpha = per / 2;
-                        tags[j].css({
-                            'left': mathAssets.whratio * (tags[j].x - tags[j].w * per) + mathAssets.halfWidth,
-                            'top': mathAssets.hwratio * (tags[j].y - tags[j].h * per) + mathAssets.halfHeight,
-                            'opacity': tags[j].alpha,
-                            'font-size': options.fontMultiplier * tags[j].alpha + 'px',
-                            'z-index': Math.round(-tags[j].cz)
-                        });
-                    }
-                }
-            }
-        })(jQuery);
-    </script>
 </head>
 <body>
-    <div id="tagcloud">
-        <ul>
-	    <li><a href="https://www.instagram.com/new__grid/" target="_blank">INSTAGRAM</a></li>
-            <li><a href="https://www.instagram.com/new__grid/" target="_blank">INSTAGRAM</a></li>
-            <li><a href="https://www.instagram.com/new__grid/" target="_blank">INSTAGRAM</a></li>
-            <li><a href="https://www.instagram.com/new__grid/" target="_blank">INSTAGRAM</a></li>
-            <li><a href="https://www.instagram.com/new__grid/" target="_blank">INSTAGRAM</a></li>
-            <li><a href="https://too.fm/0-x1" target="_blank">MUSIC</a></li>
-            <li><a href="https://too.fm/0-x1" target="_blank">MUSIC</a></li>
-            <li><a href="https://too.fm/0-x1" target="_blank">MUSIC</a></li>
-            <li><a href="https://too.fm/0-x1" target="_blank">MUSIC</a></li>
-            <li><a href="https://too.fm/0-x1" target="_blank">MUSIC</a></li>
-            <li><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank">WEBSITE</a></li>
-            <li><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank">WEBSITE</a></li>
-            <li><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank">WEBSITE</a></li>
-            <li><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank">WEBSITE</a></li>
-            <li><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank">WEBSITE</a></li>            
-	    <li><a href="https://github.com/n3wgr1d" target="_blank">GITHUB</a></li>
-            <li><a href="https://github.com/n3wgr1d" target="_blank">GITHUB</a></li>
-            <li><a href="https://github.com/n3wgr1d" target="_blank">GITHUB</a></li>
-            <li><a href="https://github.com/n3wgr1d" target="_blank">GITHUB</a></li>
-            <li><a href="https://github.com/n3wgr1d" target="_blank">GITHUB</a></li>
-        </ul>
+    <div class="container">
+        <div class="cube">
+            <div class="face face1"><a href="https://example1.com">Link 1</a></div>
+            <div class="face face2"><a href="https://example2.com">Link 2</a></div>
+            <div class="face face3"><a href="https://example3.com">Link 3</a></div>
+            <div class="face face4"><a href="https://example4.com">Link 4</a></div>
+            <div class="face face5"><a href="https://example5.com">Link 5</a></div>
+            <div class="face face6"><a href="https://example6.com">Link 6</a></div>
+        </div>
     </div>
+    <script>
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', function(event) {
+                const alpha = event.alpha; // Rotation around z-axis
+                const beta = event.beta; // Rotation around x-axis
+                const gamma = event.gamma; // Rotation around y-axis
+
+                const cube = document.querySelector('.cube');
+                cube.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
+            }, true);
+        } else {
+            alert("DeviceOrientation is not supported on your device.");
+        }
+    </script>
 </body>
 </html>
