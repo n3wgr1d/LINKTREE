@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Interactive 3D Cube with Trail Effect</title>
     <style>
         body, html {
             margin: 0;
@@ -13,12 +13,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #000;
+            background-color: #fff;
         }
         .container {
             width: 100%;
             height: 100%;
             perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
         .cube {
             position: relative;
@@ -32,12 +36,14 @@
             position: absolute;
             width: 200px;
             height: 200px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ccc;
+            background-color: #000;
+            border: 1px solid #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            color: red;
+            text-decoration: none;
         }
         .face1 { transform: rotateY(0deg) translateZ(100px); }
         .face2 { transform: rotateY(90deg) translateZ(100px); }
@@ -45,6 +51,21 @@
         .face4 { transform: rotateY(-90deg) translateZ(100px); }
         .face5 { transform: rotateX(90deg) translateZ(100px); }
         .face6 { transform: rotateX(-90deg) translateZ(100px); }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: black;
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: particleAnimation 2s forwards;
+        }
+        @keyframes particleAnimation {
+            to {
+                transform: translateY(-200px) translateX(200px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -59,17 +80,70 @@
         </div>
     </div>
     <script>
+        let startX, startY, currentX = 0, currentY = 0;
+
+        function rotateCube(beta, gamma) {
+            const cube = document.querySelector('.cube');
+            cube.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
+            generateParticles();
+        }
+
+        function generateParticles() {
+            const container = document.querySelector('.container');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.top = `${Math.random() * window.innerHeight}px`;
+                particle.style.left = `${Math.random() * window.innerWidth}px`;
+                particle.style.transform = `translateY(${Math.random() * 200 - 100}px) translateX(${Math.random() * 200 - 100}px)`;
+                container.appendChild(particle);
+                setTimeout(() => {
+                    particle.remove();
+                }, 2000);
+            }
+        }
+
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', function(event) {
-                const alpha = event.alpha; // Rotation around z-axis
                 const beta = event.beta; // Rotation around x-axis
                 const gamma = event.gamma; // Rotation around y-axis
 
-                const cube = document.querySelector('.cube');
-                cube.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
+                rotateCube(beta, gamma);
             }, true);
-        } else {
-            alert("DeviceOrientation is not supported on your device.");
+        }
+
+        document.querySelector('.container').addEventListener('mousedown', function(event) {
+            startX = event.clientX - currentX;
+            startY = event.clientY - currentY;
+            document.addEventListener('mousemove', onMouseMove);
+        });
+
+        document.addEventListener('mouseup', function() {
+            document.removeEventListener('mousemove', onMouseMove);
+        });
+
+        document.querySelector('.container').addEventListener('touchstart', function(event) {
+            const touch = event.touches[0];
+            startX = touch.clientX - currentX;
+            startY = touch.clientY - currentY;
+            document.addEventListener('touchmove', onTouchMove);
+        });
+
+        document.addEventListener('touchend', function() {
+            document.removeEventListener('touchmove', onTouchMove);
+        });
+
+        function onMouseMove(event) {
+            currentX = event.clientX - startX;
+            currentY = event.clientY - startY;
+            rotateCube(currentY, currentX);
+        }
+
+        function onTouchMove(event) {
+            const touch = event.touches[0];
+            currentX = touch.clientX - startX;
+            currentY = touch.clientY - startY;
+            rotateCube(currentY, currentX);
         }
     </script>
 </body>
