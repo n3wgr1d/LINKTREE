@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Cube with Trail Effect</title>
+    <title>Interactive 3D Shape with Trail Effect</title>
     <style>
         body, html {
             margin: 0;
@@ -24,7 +24,7 @@
             justify-content: center;
             position: relative;
         }
-        .cube {
+        .tetrahedron {
             position: relative;
             width: 200px;
             height: 200px;
@@ -34,10 +34,11 @@
         }
         .face {
             position: absolute;
-            width: 200px;
-            height: 200px;
-            background-color: #000;
-            border: 1px solid #fff;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 100px 100px 0 100px;
+            border-color: transparent transparent transparent #000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -45,12 +46,14 @@
             color: red;
             text-decoration: none;
         }
+        .face a {
+            color: red;
+            text-decoration: none;
+        }
         .face1 { transform: rotateY(0deg) translateZ(100px); }
-        .face2 { transform: rotateY(90deg) translateZ(100px); }
-        .face3 { transform: rotateY(180deg) translateZ(100px); }
-        .face4 { transform: rotateY(-90deg) translateZ(100px); }
-        .face5 { transform: rotateX(90deg) translateZ(100px); }
-        .face6 { transform: rotateX(-90deg) translateZ(100px); }
+        .face2 { transform: rotateY(120deg) translateZ(100px); }
+        .face3 { transform: rotateY(240deg) translateZ(100px); }
+        .face4 { transform: rotateX(90deg) translateZ(100px); }
         .particle {
             position: absolute;
             width: 4px;
@@ -70,21 +73,19 @@
 </head>
 <body>
     <div class="container">
-        <div class="cube">
+        <div class="tetrahedron">
             <div class="face face1"><a href="https://example1.com">Link 1</a></div>
             <div class="face face2"><a href="https://example2.com">Link 2</a></div>
             <div class="face face3"><a href="https://example3.com">Link 3</a></div>
             <div class="face face4"><a href="https://example4.com">Link 4</a></div>
-            <div class="face face5"><a href="https://example5.com">Link 5</a></div>
-            <div class="face face6"><a href="https://example6.com">Link 6</a></div>
         </div>
     </div>
     <script>
         let startX, startY, currentX = 0, currentY = 0;
 
-        function rotateCube(beta, gamma) {
-            const cube = document.querySelector('.cube');
-            cube.style.transform = rotateX(${-beta}deg) rotateY(${gamma}deg);
+        function rotateTetrahedron(beta, gamma) {
+            const tetrahedron = document.querySelector('.tetrahedron');
+            tetrahedron.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
             generateParticles();
         }
 
@@ -93,9 +94,9 @@
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
-                particle.style.top = ${Math.random() * window.innerHeight}px;
-                particle.style.left = ${Math.random() * window.innerWidth}px;
-                particle.style.transform = translateY(${Math.random() * 200 - 100}px) translateX(${Math.random() * 200 - 100}px);
+                particle.style.top = `${Math.random() * window.innerHeight}px`;
+                particle.style.left = `${Math.random() * window.innerWidth}px`;
+                particle.style.transform = `translateY(${Math.random() * 200 - 100}px) translateX(${Math.random() * 200 - 100}px)`;
                 container.appendChild(particle);
                 setTimeout(() => {
                     particle.remove();
@@ -108,7 +109,7 @@
                 const beta = event.beta; // Rotation around x-axis
                 const gamma = event.gamma; // Rotation around y-axis
 
-                rotateCube(beta, gamma);
+                rotateTetrahedron(beta, gamma);
             }, true);
         }
 
@@ -136,14 +137,14 @@
         function onMouseMove(event) {
             currentX = event.clientX - startX;
             currentY = event.clientY - startY;
-            rotateCube(currentY, currentX);
+            rotateTetrahedron(currentY, currentX);
         }
 
         function onTouchMove(event) {
             const touch = event.touches[0];
             currentX = touch.clientX - startX;
             currentY = touch.clientY - startY;
-            rotateCube(currentY, currentX);
+            rotateTetrahedron(currentY, currentX);
         }
     </script>
 </body>
