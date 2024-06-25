@@ -6,7 +6,7 @@
     <title>LInKs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         body, html {
             margin: 0;
@@ -43,13 +43,12 @@
             height: 200px;
             background-color: #000;
             border: 1px solid red;
-            border-bottom-color: red;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             color: red;
-            font-family: 'Major Mono Display', monospace;
+            font-family: 'Ubuntu Mono', monospace;
         }
         .face a {
             color: white;
@@ -92,9 +91,12 @@
     <script>
         let startX, startY, currentX = 0, currentY = 0;
         let gyroEnabled = true;
+        let lastOrientationEvent = 0;
 
         const deviceOrientationHandler = (event) => {
-            if (gyroEnabled) {
+            const now = Date.now();
+            if (gyroEnabled && now - lastOrientationEvent > 100) {
+                lastOrientationEvent = now;
                 const beta = event.beta; // Rotation around x-axis
                 const gamma = event.gamma; // Rotation around y-axis
 
@@ -112,7 +114,7 @@
 
         function generateParticles() {
             const container = document.querySelector('.container');
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 10; i++) { // Reduce the number of particles
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.top = `${Math.random() * window.innerHeight}px`;
