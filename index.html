@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Shape with Trail Effect</title>
+    <title>LInKs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
     <style>
         body, html {
             margin: 0;
             padding: 0;
             overflow: hidden;
             height: 100%;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -23,8 +27,9 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
-        .tetrahedron {
+        .cube {
             position: relative;
             width: 200px;
             height: 200px;
@@ -34,38 +39,40 @@
         }
         .face {
             position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 100px 100px 0 100px;
-            border-color: transparent transparent transparent #000;
+            width: 200px;
+            height: 200px;
+            background-color: #000;
+			border: 1px solid red;
+			border-bottom-color: red;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             color: red;
-            text-decoration: none;
+            font-family: 'Major Mono Display', monospace;
         }
         .face a {
-            color: red;
+            color: white;
             text-decoration: none;
         }
         .face1 { transform: rotateY(0deg) translateZ(100px); }
-        .face2 { transform: rotateY(120deg) translateZ(100px); }
-        .face3 { transform: rotateY(240deg) translateZ(100px); }
-        .face4 { transform: rotateX(90deg) translateZ(100px); }
+        .face2 { transform: rotateY(90deg) translateZ(100px); }
+        .face3 { transform: rotateY(180deg) translateZ(100px); }
+        .face4 { transform: rotateY(-90deg) translateZ(100px); }
+        .face5 { transform: rotateX(90deg) translateZ(100px); }
+        .face6 { transform: rotateX(-90deg) translateZ(100px); }
         .particle {
             position: absolute;
             width: 4px;
-            height: 4px;
-            background-color: black;
-            opacity: 0.5;
-            border-radius: 50%;
-            animation: particleAnimation 2s forwards;
+            height: 5px;
+            background-color: red;
+            opacity: 1;
+            border-radius: 100%;
+            animation: particleAnimation 0.5s forwards;
         }
         @keyframes particleAnimation {
             to {
-                transform: translateY(-200px) translateX(200px);
+                transform: translateY(-1000px) translateX(200px);
                 opacity: 0;
             }
         }
@@ -73,19 +80,21 @@
 </head>
 <body>
     <div class="container">
-        <div class="tetrahedron">
-            <div class="face face1"><a href="https://example1.com">Link 1</a></div>
-            <div class="face face2"><a href="https://example2.com">Link 2</a></div>
-            <div class="face face3"><a href="https://example3.com">Link 3</a></div>
-            <div class="face face4"><a href="https://example4.com">Link 4</a></div>
+        <div class="cube">
+            <div class="face face1"><a href="https://too.fm/0-x1" target="_blank>MUSIC</a></div>
+            <div class="face face2"><a href="https://n3wgr1d.github.io/__III_III__/" target="_blank>WEBSITE</a></div>
+            <div class="face face3"><a href="https://www.instagram.com/new__grid/" target="_blank>INSTAGRAM</a></div>
+            <div class="face face4"><a href="https://github.com/n3wgr1d" target="_blank>GITHUB</a></div>
+            <div class="face face5"><a href="https://n3wgr1d.github.io/__III_III__/_assets/coming%20soon/comingsoon.html" target="_blank>PROJECTS</a></div>
+            <div class="face face6"><a href="https://github.com/n3wgr1d/n3wgr1d/blob/ac2b57538d5db070cae70ddbe934b309c66128b5/README.md" target=_blank >???</a></div>
         </div>
     </div>
     <script>
         let startX, startY, currentX = 0, currentY = 0;
 
-        function rotateTetrahedron(beta, gamma) {
-            const tetrahedron = document.querySelector('.tetrahedron');
-            tetrahedron.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
+        function rotateCube(beta, gamma) {
+            const cube = document.querySelector('.cube');
+            cube.style.transform = `rotateX(${-beta}deg) rotateY(${gamma}deg)`;
             generateParticles();
         }
 
@@ -97,6 +106,7 @@
                 particle.style.top = `${Math.random() * window.innerHeight}px`;
                 particle.style.left = `${Math.random() * window.innerWidth}px`;
                 particle.style.transform = `translateY(${Math.random() * 200 - 100}px) translateX(${Math.random() * 200 - 100}px)`;
+
                 container.appendChild(particle);
                 setTimeout(() => {
                     particle.remove();
@@ -109,7 +119,7 @@
                 const beta = event.beta; // Rotation around x-axis
                 const gamma = event.gamma; // Rotation around y-axis
 
-                rotateTetrahedron(beta, gamma);
+                rotateCube(beta, gamma);
             }, true);
         }
 
@@ -137,14 +147,14 @@
         function onMouseMove(event) {
             currentX = event.clientX - startX;
             currentY = event.clientY - startY;
-            rotateTetrahedron(currentY, currentX);
+            rotateCube(currentY, currentX);
         }
 
         function onTouchMove(event) {
             const touch = event.touches[0];
             currentX = touch.clientX - startX;
             currentY = touch.clientY - startY;
-            rotateTetrahedron(currentY, currentX);
+            rotateCube(currentY, currentX);
         }
     </script>
 </body>
